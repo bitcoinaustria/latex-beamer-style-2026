@@ -1,0 +1,209 @@
+%% bitcoin-austria.sty
+%% Bitcoin Austria Beamer style package (2026 brand kit).
+%%
+%% Implements the Bitcoin Austria brand:
+%%   - Palette: red #E3000F, black #222222, light grey #ECECEC, white.
+%%   - Typeface: Blinker (SIL OFL 1.1), shipped in fonts/, loaded via fontspec.
+%%   - Dark logomark top-left, running short-title centre, frame number top-right.
+%%   - Bold dark headlines with a short red accent rule.
+%%
+%% Requires: XeLaTeX (fontspec). LaTeX kernel 2020-10 or newer (for
+%% \CurrentFilePath); any current TeX Live is fine.
+%%
+%% Reuse: this package is meant to be consumed as a git submodule. It locates
+%% its own fonts/ and assets/ from the directory it was loaded from, so it works
+%% regardless of where the submodule is mounted, as long as you load it by
+%% (relative) path:
+%%
+%%   \usepackage{theme/bitcoin-austria}   % theme/ = the submodule directory
+%%
+%% If auto-detection ever fails, set the directory explicitly before loading:
+%%   \def\bitcoinaustriaroot{theme/}      % note the trailing slash
+%%
+%% License: package code Apache-2.0; Blinker font under SIL OFL 1.1 (see fonts/).
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{bitcoin-austria}[2026/06/26 v0.1 Bitcoin Austria Beamer style]
+
+%% --- Required packages -------------------------------------------------------
+\RequirePackage{fontspec}
+\RequirePackage{xcolor}
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\RequirePackage{booktabs}
+\RequirePackage{etoolbox}   % robust \notblank for optional macro content
+\RequirePackage[protrusion=true,expansion=false]{microtype}
+\usetikzlibrary{calc}
+
+% Locate THIS package's directory so fonts/ and assets/ resolve no matter where
+% the submodule is mounted. \CurrentFilePath is the directory we were loaded
+% from (e.g. "theme"); we append a slash. A consumer may override by defining
+% \bitcoinaustriaroot (with trailing slash) before \usepackage.
+\providecommand\CurrentFilePath{}        % guard for pre-2020 kernels
+\edef\ba@root{\CurrentFilePath}
+\ifx\ba@root\@empty\else\edef\ba@root{\ba@root/}\fi
+\@ifundefined{bitcoinaustriaroot}{}{\edef\ba@root{\bitcoinaustriaroot}}
+
+% Let \includegraphics find the bundled logos and the consumer's own images.
+\graphicspath{{\ba@root}{\ba@root assets/}{pix/}{assets/}}
+
+%% --- Brand colours -----------------------------------------------------------
+\definecolor{baRed}{HTML}{E3000F}
+\definecolor{baBlack}{HTML}{222222}
+\definecolor{baGrey}{HTML}{ECECEC}
+\definecolor{baWhite}{HTML}{FFFFFF}
+
+%% --- Typography: Blinker via fontspec ----------------------------------------
+\defaultfontfeatures{Ligatures=TeX}
+\setsansfont{Blinker}[
+  Path = \ba@root fonts/, Extension = .ttf,
+  UprightFont = *-Regular, BoldFont = *-Bold ]
+\setmainfont{Blinker}[
+  Path = \ba@root fonts/, Extension = .ttf,
+  UprightFont = *-Regular, BoldFont = *-Bold ]
+% Heavy display weight for headlines/titles, and a light weight for subtitles.
+\newfontfamily\headlinefont{Blinker}[Path = \ba@root fonts/, Extension = .ttf, UprightFont = *-ExtraBold]
+\newfontfamily\lightfont{Blinker}[Path = \ba@root fonts/, Extension = .ttf, UprightFont = *-Light]
+
+%% --- Beamer colour theme -----------------------------------------------------
+\setbeamercolor{background canvas}{bg=baGrey}
+\setbeamercolor{normal text}{fg=baBlack, bg=baGrey}
+\setbeamercolor{structure}{fg=baRed}
+\setbeamercolor{alerted text}{fg=baRed}
+\setbeamercolor{frametitle}{fg=baBlack}
+\setbeamercolor{title}{fg=baBlack}
+\setbeamercolor{subtitle}{fg=baBlack}
+\setbeamercolor{itemize item}{fg=baBlack}
+\setbeamercolor{itemize subitem}{fg=baBlack}
+\setbeamercolor{itemize subsubitem}{fg=baBlack}
+\setbeamercolor{block title}{bg=baBlack, fg=baWhite}
+\setbeamercolor{block body}{bg=baBlack!6, fg=baBlack}
+\setbeamercolor{block title alerted}{bg=baRed, fg=baWhite}
+\setbeamercolor{block body alerted}{bg=baRed!10, fg=baBlack}
+
+%% --- Fonts in beamer ---------------------------------------------------------
+\setbeamerfont{frametitle}{family=\headlinefont}
+\setbeamerfont{title}{family=\headlinefont}
+\setbeamerfont{headline}{size=\scriptsize}
+
+%% --- Chrome ------------------------------------------------------------------
+\setbeamertemplate{navigation symbols}{}
+\setbeamersize{text margin left=20pt, text margin right=20pt}
+\setbeamertemplate{blocks}[default]   % rectangular, sharp edges (matches the brand)
+
+% Bullets: filled circle / open circle / filled square (per the brand master).
+\setbeamertemplate{itemize item}{\small\raise0.4pt\hbox{\textbullet}}
+\setbeamertemplate{itemize subitem}{\footnotesize\raise0.4pt\hbox{$\circ$}}
+\setbeamertemplate{itemize subsubitem}{\footnotesize\raise0.4pt\hbox{\textbullet}}
+
+% Top band: logomark (left) + running short title (centre) + frame number (right).
+\setbeamertemplate{headline}{%
+  \leavevmode%
+  \vskip6pt%
+  \hbox to \paperwidth{%
+    \hskip14pt\relax
+    \raisebox{-0.32\height}{\includegraphics[height=15pt]{ba-logomark}}%
+    \hfill
+    {\usebeamerfont{headline}\color{baBlack!75}\insertshorttitle}%
+    \hfill
+    {\usebeamerfont{headline}\color{baBlack!75}\insertframenumber}%
+    \hskip14pt\relax
+  }%
+}
+
+% No footline (the frame number lives in the headline).
+\setbeamertemplate{footline}{}
+
+% Frame title: heavy dark headline with a short red accent rule beneath.
+\setbeamertemplate{frametitle}{%
+  \vskip8pt%
+  {\usebeamerfont{frametitle}\color{baBlack}\fontsize{19}{22}\selectfont\insertframetitle}\par
+  \vskip3pt%
+  {\color{baRed}\rule{2.4em}{2pt}}\par
+  \vskip4pt%
+}
+
+%% --- Title page --------------------------------------------------------------
+\setbeamertemplate{title page}{%
+  \vfill
+  {\headlinefont\color{baBlack}\fontsize{36}{40}\selectfont\inserttitle\par}%
+  \vskip0.45em%
+  {\color{baRed}\rule{2.6em}{3pt}\par}%
+  \ifx\insertsubtitle\@empty\else
+    \vskip0.9em{\lightfont\color{baBlack}\fontsize{18}{22}\selectfont\insertsubtitle\par}%
+  \fi
+  \vskip2.4em%
+  {\color{baBlack}\insertauthor\par}%
+  {\color{baBlack!70}\small\insertdate\par}%
+  \vfill
+  \hbox{\includegraphics[height=26pt]{ba-logo-horizontal}}%
+}
+
+%% --- Section divider (centred, like the brand master) ------------------------
+\setbeamertemplate{section page}{%
+  \centering\vfill
+  {\headlinefont\color{baBlack}\fontsize{30}{34}\selectfont\insertsectionhead\par}%
+  \vskip0.4em{\color{baRed}\rule{2.4em}{2.5pt}\par}%
+  \vfill
+}
+\AtBeginSection[]{%
+  \begin{frame}[plain,noframenumbering]
+    \sectionpage
+  \end{frame}%
+}
+
+%% =============================================================================
+%% Content macros — one macro per slide type, for consistency.
+%% =============================================================================
+
+%% \fillerslide[subtitle]{headline}
+%% A dark-background "filler" / topic-divider slide: black canvas, the light
+%% logomark, a large white headline, a red accent rule, and an optional small
+%% subtitle. Use it to separate topics.
+\newcommand{\fillerslide}[2][]{%
+  {%
+    \setbeamercolor{background canvas}{bg=baBlack}%
+    \begin{frame}[plain,noframenumbering]
+      \centering\vfill
+      \includegraphics[height=20pt]{ba-logomark-light}\par
+      \vskip1.1em
+      {\headlinefont\color{baWhite}\fontsize{30}{34}\selectfont #2\par}%
+      \vskip0.5em{\color{baRed}\rule{2.6em}{2.5pt}\par}%
+      \notblank{#1}{\vskip0.7em{\lightfont\color{baWhite!85}\fontsize{15}{19}\selectfont #1\par}}{}%
+      \vfill
+    \end{frame}%
+  }%
+}
+
+%% \comparisonslide{title}{left header}{left body}{right header}{right body}%
+%%                 {note heading}{note body}
+%% A two-column comparison: the left column carries the red accent, the right
+%% column the dark accent, with an optional full-width callout underneath. Leave
+%% the note heading and body empty ({}{}) to omit the callout.
+\newcommand{\comparisonslide}[7]{%
+  \begin{frame}{#1}
+    \begin{columns}[T]
+      \begin{column}{0.48\textwidth}
+        \begingroup
+          \setbeamercolor{block title}{bg=baRed,fg=baWhite}%
+          \setbeamercolor{block body}{bg=baRed!8,fg=baBlack}%
+          \begin{block}{#2}#3\end{block}
+        \endgroup
+      \end{column}
+      \hfill
+      \begin{column}{0.48\textwidth}
+        \begingroup
+          \setbeamercolor{block title}{bg=baBlack,fg=baWhite}%
+          \setbeamercolor{block body}{bg=baBlack!6,fg=baBlack}%
+          \begin{block}{#4}#5\end{block}
+        \endgroup
+      \end{column}
+    \end{columns}
+    \notblank{#7}{%
+      \vfill
+      \begin{alertblock}{#6}#7\end{alertblock}%
+    }{}%
+  \end{frame}%
+}
+
+\endinput

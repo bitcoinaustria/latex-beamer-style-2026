@@ -1,0 +1,42 @@
+name: Build demo
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install LaTeX (XeLaTeX + latexmk)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            texlive-xetex \
+            texlive-latex-base \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            latexmk \
+            make
+
+      - name: Build the demo deck
+        working-directory: example
+        run: make
+
+      - name: Upload demo PDF
+        uses: actions/upload-artifact@v7
+        with:
+          name: bitcoin-austria-style-demo
+          path: example/demo.pdf
+          retention-days: 30

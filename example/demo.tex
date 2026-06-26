@@ -1,0 +1,93 @@
+% Demo deck for the Bitcoin Austria Beamer style.
+% Brand-generic content (about Bitcoin Austria) — also the CI self-test.
+% Build from this directory with:  latexmk -xelatex demo.tex
+% (The style package is one level up; it self-locates its fonts/ and assets/.)
+\documentclass[aspectratio=169,t,9pt]{beamer}
+
+\usepackage{../bitcoin-austria}
+
+\title{Bitcoin Austria}
+\subtitle{Wenn dein Geld wirklich nur dir gehört.}
+\author{Bitcoin Austria}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}[plain,noframenumbering]
+  \titlepage
+\end{frame}
+
+\section{Wer wir sind}
+
+\begin{frame}{Über uns}
+  \begin{itemize}
+    \item Die \textbf{älteste Bitcoin-Organisation der Welt} — gegründet 2011
+      aus den ersten Wiener Meetups
+    \item Über \textbf{200 Meetups und Events} mit tausenden Teilnehmenden
+    \item Gemeinnützig und unabhängig — finanziert ausschließlich durch
+      \textbf{Bitcoin-Spenden}
+    \item Eine zivilgesellschaftliche Stimme für unabhängige Bitcoin-Expertise
+      in Österreich
+  \end{itemize}
+
+  \vfill
+  \begin{block}{Unser Auftrag}
+    Bitcoin Austria vermittelt unabhängiges Wissen, damit du informierte
+    Entscheidungen über dein Geld triffst – gemeinnützig, seit 2011.
+  \end{block}
+\end{frame}
+
+\fillerslide[Drei Prinzipien, die nicht verhandelbar sind]{Unsere Werte}
+
+\section{Unsere Werte}
+
+\begin{frame}{Drei Prinzipien}
+  \begin{itemize}
+    \item \textbf{Bitcoin Only} — ein dezentrales Netzwerk, kein spekulatives
+      Krypto-Asset
+    \item \textbf{Privatsphäre} — nicht verhandelbar; ein klares Nein zu
+      programmierbaren CBDCs
+    \item \textbf{Wissen statt Marketing} — Erklärungen statt Anlageberatung
+  \end{itemize}
+
+  \vfill
+  \begin{alertblock}{Wofür wir stehen}
+    Wirtschaftliche Selbstbestimmung — im Geist der Österreichischen Schule.
+  \end{alertblock}
+\end{frame}
+
+\comparisonslide{Bitcoin ist nicht „Krypto“}%
+  {Bitcoin}{%
+    \begin{itemize}
+      \item Dezentrales Netzwerk, kein Emittent
+      \item Feste, vorhersehbare Geldmenge
+      \item Open Source, seit 2011 ununterbrochen
+    \end{itemize}}%
+  {„Krypto“}{%
+    \begin{itemize}
+      \item Marketing und Spekulation
+      \item Oft zentral kontrolliert
+      \item Beliebig vermehrbar
+    \end{itemize}}%
+  {Warum wir unterscheiden}{%
+    Wir erklären Bitcoin — und grenzen es klar von spekulativen
+    Krypto-Projekten ab.}
+
+\begin{frame}{Mitmachen}
+  \begin{itemize}
+    \item Bildungsinhalte zu Technik, Ökonomie und Gesellschaft
+    \item Meetups, öffentliche Events und Pressearbeit
+    \item Gespräche mit politischen Entscheidungsträgerinnen und -trägern
+    \item Förderung von Open Source und einer offenen Community
+  \end{itemize}
+
+  \vfill
+  \begin{center}
+    „Damit mehr Menschen Bitcoin verstehen — nicht, damit jemand daran verdient.“
+
+    \medskip
+    \large \textbf{bitcoin-austria.at}
+  \end{center}
+\end{frame}
+
+\end{document}
