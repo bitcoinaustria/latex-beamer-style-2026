@@ -162,14 +162,14 @@
 %% caption is overlaid in a dark bar at the bottom (use it for a source URL).
 \newcommand{\fullbleedslide}[2][]{%
   {%
-    \setbeamersize{text margin left=0pt, text margin right=0pt}%
     \usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{#2}}%
     \begin{frame}[plain,noframenumbering]
       \notblank{#1}{%
-        \vfill
-        \begin{beamercolorbox}[wd=\paperwidth,sep=8pt]{fullbleed caption}
-          \small #1
-        \end{beamercolorbox}%
+        \begin{tikzpicture}[remember picture,overlay]
+          \node[anchor=south, fill=baBlack, text=baWhite, align=center,
+                minimum width=\paperwidth, inner xsep=8pt, inner ysep=7pt,
+                font=\small] at (current page.south) {#1};
+        \end{tikzpicture}%
       }{}%
     \end{frame}%
   }%
