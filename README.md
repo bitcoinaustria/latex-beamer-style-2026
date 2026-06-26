@@ -34,6 +34,8 @@ Slide macros provided by the package:
   full-width callout underneath.
 - `\fillerslide[subtitle]{headline}` — a dark-background topic-divider slide
   (light logomark, white headline, red accent rule).
+- `\fullbleedslide[caption]{image}` — a frame whose image fills the slide edge
+  to edge, with an optional caption bar (e.g. a source URL).
 
 Blocks are rectangular (sharp-edged) to match the brand's geometric style.
 

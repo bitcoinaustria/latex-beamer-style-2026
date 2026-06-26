@@ -80,6 +80,7 @@
 \setbeamercolor{block body}{bg=baBlack!6, fg=baBlack}
 \setbeamercolor{block title alerted}{bg=baRed, fg=baWhite}
 \setbeamercolor{block body alerted}{bg=baRed!10, fg=baBlack}
+\setbeamercolor{fullbleed caption}{bg=baBlack, fg=baWhite}
 
 %% --- Fonts in beamer ---------------------------------------------------------
 \setbeamerfont{frametitle}{family=\headlinefont}
@@ -155,6 +156,24 @@
 %% =============================================================================
 %% Content macros — one macro per slide type, for consistency.
 %% =============================================================================
+
+%% \fullbleedslide[caption]{image}
+%% A frame whose image fills the entire slide, edge to edge. The optional
+%% caption is overlaid in a dark bar at the bottom (use it for a source URL).
+\newcommand{\fullbleedslide}[2][]{%
+  {%
+    \setbeamersize{text margin left=0pt, text margin right=0pt}%
+    \usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{#2}}%
+    \begin{frame}[plain,noframenumbering]
+      \notblank{#1}{%
+        \vfill
+        \begin{beamercolorbox}[wd=\paperwidth,sep=8pt]{fullbleed caption}
+          \small #1
+        \end{beamercolorbox}%
+      }{}%
+    \end{frame}%
+  }%
+}
 
 %% \fillerslide[subtitle]{headline}
 %% A dark-background "filler" / topic-divider slide: black canvas, the light
