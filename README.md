@@ -36,6 +36,8 @@ Slide macros provided by the package:
   (light logomark, white headline, red accent rule).
 - `\fullbleedslide[caption]{image}` — a frame whose image fills the slide edge
   to edge, with an optional caption bar (e.g. a source URL).
+- `\comparisontable{Lhead}{Rhead}{rows}` — a booktabs side-by-side comparison
+  table (red left column, dark right column); used inside a frame.
 
 Blocks are rectangular (sharp-edged) to match the brand's geometric style.
 

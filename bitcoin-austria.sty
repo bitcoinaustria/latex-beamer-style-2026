@@ -234,4 +234,22 @@
   \end{frame}%
 }
 
+%% \comparisontable{left header}{right header}{rows}
+%% A booktabs comparison table for side-by-side technical comparisons: first
+%% column = dimension labels, then a red-headed "left" column and a dark-headed
+%% "right" column. Provide the body rows ("Dimension & left & right \\"). Use
+%% inside a frame (add \centering to centre it).
+\newcommand{\comparisontable}[3]{%
+  {\small
+   \setlength{\tabcolsep}{9pt}%
+   \renewcommand{\arraystretch}{1.4}%
+   \begin{tabular}{@{}lll@{}}
+     \toprule
+       & \textcolor{baRed}{\textbf{#1}} & \textbf{#2} \\
+     \midrule
+     #3
+     \bottomrule
+   \end{tabular}}%
+}
+
 \endinput
