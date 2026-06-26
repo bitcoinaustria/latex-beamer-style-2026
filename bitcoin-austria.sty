@@ -160,9 +160,18 @@
 %% \fullbleedslide[caption]{image}
 %% A frame whose image fills the entire slide, edge to edge. The optional
 %% caption is overlaid in a dark bar at the bottom (use it for a source URL).
+% The image is scaled to the slide WIDTH and clipped to the page ("cover"), so
+% it fills edge-to-edge without distortion. (Good for images up to ~16:9; a much
+% wider panorama would letterbox top/bottom — scale by height instead if so.)
 \newcommand{\fullbleedslide}[2][]{%
   {%
-    \usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{#2}}%
+    \usebackgroundtemplate{%
+      \begin{tikzpicture}[remember picture,overlay]
+        \clip (current page.south west) rectangle (current page.north east);
+        \node[anchor=center,inner sep=0] at (current page.center)
+          {\includegraphics[width=\paperwidth]{#2}};
+      \end{tikzpicture}%
+    }%
     \begin{frame}[plain,noframenumbering]
       \notblank{#1}{%
         \begin{tikzpicture}[remember picture,overlay]
