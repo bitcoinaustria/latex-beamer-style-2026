@@ -19,16 +19,26 @@
 
 \section{Wer wir sind}
 
+% Corner image: a cropped, captioned meetup photo in the top-right corner.
+% Placed below the headline band so it never collides with the logo/title.
+% The image floats ON TOP of the slide and does not reflow text, so we keep the
+% body in a narrower left column that stays clear of (and reads beside) the photo.
+\cornerimage[width=0.20\paperwidth, viewport=150 90 760 600, clip,
+             border, caption=Wiener Meetup]{meetup}
 \begin{frame}{Über uns}
-  \begin{itemize}
-    \item Die \textbf{älteste Bitcoin-Organisation der Welt} — gegründet 2011
-      aus den ersten Wiener Meetups
-    \item Über \textbf{200 Meetups und Events} mit tausenden Teilnehmenden
-    \item Gemeinnützig und unabhängig — finanziert ausschließlich durch
-      \textbf{Bitcoin-Spenden}
-    \item Eine zivilgesellschaftliche Stimme für unabhängige Bitcoin-Expertise
-      in Österreich
-  \end{itemize}
+  % Left-aligned narrow column so the bullets read beside the corner photo,
+  % never under it (the corner image is an overlay and does not reflow text).
+  \noindent\begin{minipage}[t]{0.68\textwidth}
+    \begin{itemize}
+      \item Die \textbf{älteste Bitcoin-Organisation der Welt} — gegründet
+        2011 aus den ersten Wiener Meetups
+      \item Über \textbf{200 Meetups und Events} mit tausenden Teilnehmenden
+      \item Gemeinnützig und unabhängig — finanziert ausschließlich durch
+        \textbf{Bitcoin-Spenden}
+      \item Eine zivilgesellschaftliche Stimme für unabhängige
+        Bitcoin-Expertise in Österreich
+    \end{itemize}
+  \end{minipage}
 
   \vfill
   \begin{block}{Unser Auftrag}
@@ -74,6 +84,8 @@
     Wir erklären Bitcoin — und grenzen es klar von spekulativen
     Krypto-Projekten ab.}
 
+% Corner image on a theme-generated layout: bottom-right, full (uncropped) photo.
+\cornerimage[corner=bottom-right, width=0.16\paperwidth, border]{meetup}
 \begin{frame}{Bitcoin vs. Fiat-Geldsystem}
   \centering
   \comparisontable{Bitcoin}{Fiat-Geldsystem}{%
@@ -85,6 +97,8 @@
   }
 \end{frame}
 
+% Simplest call: bare width, default top-right corner.
+\cornerimage[0.17\paperwidth]{meetup}
 \begin{frame}{Mitmachen}
   \begin{itemize}
     \item Bildungsinhalte zu Technik, Ökonomie und Gesellschaft

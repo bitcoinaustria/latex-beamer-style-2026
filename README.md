@@ -38,14 +38,52 @@ Slide macros provided by the package:
   to edge, with an optional caption bar (e.g. a source URL).
 - `\comparisontable{Lhead}{Rhead}{rows}` — a booktabs side-by-side comparison
   table (red left column, dark right column); used inside a frame.
+- `\cornerimage[options]{image}` — floats a small image into a slide corner,
+  **over** everything else, so it works even on theme-generated slides (call it
+  right before the slide/macro). It clears the logo/title band by default and
+  never collides with the brand furniture. `\cornerimage*` persists the image
+  across the following slides (until `\clearcornerimage`). See below.
 
 Blocks are rectangular (sharp-edged) to match the brand's geometric style.
+
+### `\cornerimage` — corner overlays with cropping
+
+```latex
+\cornerimage{photo}                               % default: top-right, ~0.13\paperwidth
+\cornerimage[3cm]{photo}                           % bare width (backward compatible)
+\cornerimage[corner=bottom-left, width=0.18\paperwidth, border]{photo}
+\cornerimage[viewport=150 90 760 600, clip, caption=Wiener Meetup]{photo}  % crop a region
+```
+
+Call it **immediately before** the frame (or slide macro) you want to decorate;
+the unstarred form paints only the next page, so it never bleeds onto the slide
+after. Key=value options:
+
+| key | meaning |
+|-----|---------|
+| `width=<len>` | image width (default `0.13\paperwidth`) |
+| `height=<len>` | cap the height too (keeps aspect ratio) |
+| `corner=<pos>` | `top-right` (default), `top-left`, `bottom-right`, `bottom-left` |
+| `trim=<l b r t>` | **crop** by these amounts (implies `clip`) |
+| `viewport=<llx lly urx ury>` | **crop** to this source region (implies `clip`) |
+| `clip=true\|false` | clip to the crop box (auto-on with `trim`/`viewport`) |
+| `border=true\|false` | white matte frame around the image |
+| `caption=<text>` | small caption under the image, aligned to its outer edge |
+| `hmargin` / `vmargin` / `topclear` | override the brand edge gaps (pt/len) |
+
+> The overlay floats on top and does **not** reflow text — on a normal content
+> frame, keep the body clear of the corner (e.g. set it in a narrower column),
+> as the demo's *Über uns* slide does.
 
 ## Requirements
 
 - **XeLaTeX** (the package loads Blinker via `fontspec`).
 - A current LaTeX kernel (2020-10+) — uses `\CurrentFilePath` to self-locate.
 - `latexmk` to build (recommended).
+- **Aspect ratio:** works at any beamer `aspectratio` — the demo uses 16:9
+  (`aspectratio=169`), and **4:3** is fully supported too; just set
+  `\documentclass[aspectratio=43]{beamer}`. The theme uses relative lengths, so
+  the layout (and corner images) adapt automatically.
 
 ## Use it in a presentation (git submodule)
 

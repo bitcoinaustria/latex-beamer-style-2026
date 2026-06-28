@@ -32,6 +32,8 @@
 \RequirePackage{tikz}
 \RequirePackage{booktabs}
 \RequirePackage{etoolbox}   % robust \notblank for optional macro content
+\RequirePackage{eso-pic}    % \AddToShipoutPictureFG for corner overlays
+\RequirePackage{keyval}     % key=value options for \cornerimage (also via graphicx)
 \RequirePackage[protrusion=true,expansion=false]{microtype}
 \usetikzlibrary{calc}
 
@@ -251,5 +253,121 @@
      \bottomrule
    \end{tabular}}%
 }
+
+%% \cornerimage[options]{image}      decorate the NEXT slide
+%% \cornerimage*[options]{image}     decorate EVERY following slide (until reset)
+%%
+%% Floats a small image into a corner of a slide, OVER everything else — so it
+%% works even on theme-generated slides (\comparisonslide, \fillerslide,
+%% \fullbleedslide, plain frame) where you cannot inject frame content. Call it
+%% IMMEDIATELY BEFORE the slide (or slide-macro) you want to decorate; the
+%% unstarred form paints only the next shipped page, so it never bleeds onto the
+%% slide after. The starred form persists across all following slides until
+%% \clearcornerimage. Because the theme owns the layout, the default placement
+%% clears the top logo/title band — the image never collides with the brand
+%% furniture.
+%%
+%% Options (key=value). The optional argument may instead be a bare width for
+%% backward compatibility, i.e. \cornerimage[3cm]{img} == \cornerimage[width=3cm]{img}:
+%%   width=<len>      image width (default 0.13\paperwidth)
+%%   height=<len>     cap the height too (keeps aspect ratio within the box)
+%%   corner=<pos>     top-right (default), top-left, bottom-right, bottom-left
+%%   trim=<l b r t>   crop the source by these amounts (implies clip)
+%%   viewport=<llx lly urx ury>  show only this region of the source (implies clip)
+%%   clip=true|false  clip to the trim/viewport box (auto-on when either is set)
+%%   border=true|false  white matte frame around the image (default off)
+%%   caption=<text>   small caption under the image, aligned to its outer edge
+%%   hmargin=<len>    gap from the left/right page edge (default 14pt, brand inset)
+%%   vmargin=<len>    gap from the bottom page edge, bottom corners (default 14pt)
+%%   topclear=<len>   gap from the top page edge, top corners (default 26pt, sits
+%%                    level with the frame title, just below the headline/page
+%%                    number band; set ~6pt on plain/filler slides if desired)
+\newsavebox\ba@ci@box
+\newif\ifba@ci@persist
+\newif\ifba@ci@clip
+\newif\ifba@ci@border
+\newlength\ba@ci@hmargin
+\newlength\ba@ci@vmargin
+\newlength\ba@ci@topclear
+\def\ba@ci@cTR{top-right}\def\ba@ci@cTL{top-left}%
+\def\ba@ci@cBR{bottom-right}\def\ba@ci@cBL{bottom-left}%
+
+\define@key{ba@ci}{width}{\def\ba@ci@width{#1}}
+\define@key{ba@ci}{height}{\def\ba@ci@height{#1}}
+\define@key{ba@ci}{corner}{\def\ba@ci@corner{#1}}
+\define@key{ba@ci}{trim}{\def\ba@ci@trim{#1}\ba@ci@cliptrue}
+\define@key{ba@ci}{viewport}{\def\ba@ci@viewport{#1}\ba@ci@cliptrue}
+\define@key{ba@ci}{clip}[true]{\csname ba@ci@clip#1\endcsname}
+\define@key{ba@ci}{border}[true]{\csname ba@ci@border#1\endcsname}
+\define@key{ba@ci}{caption}{\def\ba@ci@cap{#1}}
+\define@key{ba@ci}{hmargin}{\setlength\ba@ci@hmargin{#1}}
+\define@key{ba@ci}{vmargin}{\setlength\ba@ci@vmargin{#1}}
+\define@key{ba@ci}{topclear}{\setlength\ba@ci@topclear{#1}}
+
+\newcommand\cornerimage{\@ifstar
+  {\ba@ci@persisttrue\ba@ci@grab}%
+  {\ba@ci@persistfalse\ba@ci@grab}}
+\newcommand\ba@ci@grab[2][]{%
+  % reset to defaults so keys never leak between calls
+  \def\ba@ci@width{0.13\paperwidth}\def\ba@ci@height{}\def\ba@ci@corner{top-right}%
+  \def\ba@ci@trim{}\def\ba@ci@viewport{}\ba@ci@clipfalse
+  \ba@ci@borderfalse\def\ba@ci@cap{}%
+  \setlength\ba@ci@hmargin{14pt}\setlength\ba@ci@vmargin{14pt}%
+  \setlength\ba@ci@topclear{26pt}%
+  % parse optional arg: key=value list, or a bare width for backward compat
+  \notblank{#1}{\in@{=}{#1}\ifin@\setkeys{ba@ci}{#1}\else\def\ba@ci@width{#1}\fi}{}%
+  \ba@ci@emit{#2}%
+}
+% Build the image box (with optional crop / border / caption) and \put it.
+\newcommand\ba@ci@emit[1]{%
+  \edef\ba@ci@gopts{width=\ba@ci@width,keepaspectratio%
+    \ifx\ba@ci@height\@empty\else,height=\ba@ci@height\fi%
+    \ifx\ba@ci@trim\@empty\else,trim=\ba@ci@trim\fi%
+    \ifx\ba@ci@viewport\@empty\else,viewport=\ba@ci@viewport\fi%
+    \ifba@ci@clip,clip\fi}%
+  \ifba@ci@persist
+    \AddToShipoutPictureFG{\ba@ci@place{#1}}%
+  \else
+    \AddToShipoutPictureFG*{\ba@ci@place{#1}}%
+  \fi}
+\newcommand\ba@ci@place[1]{%
+  % \expandafter so the option list reaches \includegraphics as real, comma-
+  % separated keys (a bare macro token would be parsed as one undefined key).
+  \sbox\ba@ci@box{%
+    \ifba@ci@border
+      \setlength{\fboxsep}{2.5pt}\setlength{\fboxrule}{0.8pt}%
+      \fcolorbox{baWhite}{baWhite}%
+        {\expandafter\includegraphics\expandafter[\ba@ci@gopts]{#1}}%
+    \else
+      \expandafter\includegraphics\expandafter[\ba@ci@gopts]{#1}%
+    \fi}%
+  % caption: stack it under the image, aligned to the image's outer edge
+  \notblank{\ba@ci@cap}{%
+    \edef\ba@ci@just{\ifx\ba@ci@corner\ba@ci@cTL\noexpand\raggedright\else
+      \ifx\ba@ci@corner\ba@ci@cBL\noexpand\raggedright\else\noexpand\raggedleft\fi\fi}%
+    \sbox\ba@ci@box{%
+      \begin{minipage}{\wd\ba@ci@box}%
+        \usebox\ba@ci@box\par\vskip2pt
+        {\scriptsize\color{baBlack!70}\ba@ci@just\ba@ci@cap\par}%
+      \end{minipage}}%
+  }{}%
+  % horizontal position: left corners hug hmargin; right corners hug the right edge
+  \edef\ba@ci@x{\ifx\ba@ci@corner\ba@ci@cTL\the\ba@ci@hmargin\else
+    \ifx\ba@ci@corner\ba@ci@cBL\the\ba@ci@hmargin\else
+    \the\dimexpr\paperwidth-\ba@ci@hmargin-\wd\ba@ci@box\relax\fi\fi}%
+  % Anchor to the real page edges (eso-pic helpers) so distances are exact and
+  % independent of the picture's default origin. Top corners drop topclear below
+  % the top edge; bottom corners sit vmargin above the bottom edge.
+  \ifx\ba@ci@corner\ba@ci@cBR
+    \AtPageLowerLeft{\put(\LenToUnit{\ba@ci@x},\LenToUnit{\ba@ci@vmargin}){\usebox\ba@ci@box}}%
+  \else\ifx\ba@ci@corner\ba@ci@cBL
+    \AtPageLowerLeft{\put(\LenToUnit{\ba@ci@x},\LenToUnit{\ba@ci@vmargin}){\usebox\ba@ci@box}}%
+  \else
+    \AtPageUpperLeft{\put(\LenToUnit{\ba@ci@x},%
+      \LenToUnit{\dimexpr-\ba@ci@topclear-\ht\ba@ci@box-\dp\ba@ci@box\relax}){\usebox\ba@ci@box}}%
+  \fi\fi
+}
+% Stop a persistent \cornerimage* from decorating further slides.
+\newcommand\clearcornerimage{\ClearShipoutPictureFG}
 
 \endinput
