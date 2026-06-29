@@ -351,21 +351,20 @@
         {\scriptsize\color{baBlack!70}\ba@ci@just\ba@ci@cap\par}%
       \end{minipage}}%
   }{}%
-  % horizontal position: left corners hug hmargin; right corners hug the right edge
+  % Normalise the box to zero depth so its reference point is its bottom edge:
+  % the corner maths can then anchor box edges directly to the page edges.
+  \sbox\ba@ci@box{\raisebox{\dp\ba@ci@box}{\usebox\ba@ci@box}}%
+  % The shipout-foreground picture has its origin at the page's LOWER-LEFT corner.
+  % x: left corners hug hmargin; right corners hug the right edge.
   \edef\ba@ci@x{\ifx\ba@ci@corner\ba@ci@cTL\the\ba@ci@hmargin\else
     \ifx\ba@ci@corner\ba@ci@cBL\the\ba@ci@hmargin\else
     \the\dimexpr\paperwidth-\ba@ci@hmargin-\wd\ba@ci@box\relax\fi\fi}%
-  % Anchor to the real page edges (eso-pic helpers) so distances are exact and
-  % independent of the picture's default origin. Top corners drop topclear below
-  % the top edge; bottom corners sit vmargin above the bottom edge.
-  \ifx\ba@ci@corner\ba@ci@cBR
-    \AtPageLowerLeft{\put(\LenToUnit{\ba@ci@x},\LenToUnit{\ba@ci@vmargin}){\usebox\ba@ci@box}}%
-  \else\ifx\ba@ci@corner\ba@ci@cBL
-    \AtPageLowerLeft{\put(\LenToUnit{\ba@ci@x},\LenToUnit{\ba@ci@vmargin}){\usebox\ba@ci@box}}%
-  \else
-    \AtPageUpperLeft{\put(\LenToUnit{\ba@ci@x},%
-      \LenToUnit{\dimexpr-\ba@ci@topclear-\ht\ba@ci@box-\dp\ba@ci@box\relax}){\usebox\ba@ci@box}}%
-  \fi\fi
+  % y: bottom corners sit vmargin above the bottom edge; top corners drop topclear
+  % below the top edge (box height now includes the former depth).
+  \edef\ba@ci@y{\ifx\ba@ci@corner\ba@ci@cBR\the\ba@ci@vmargin\else
+    \ifx\ba@ci@corner\ba@ci@cBL\the\ba@ci@vmargin\else
+    \the\dimexpr\paperheight-\ba@ci@topclear-\ht\ba@ci@box\relax\fi\fi}%
+  \put(\LenToUnit{\ba@ci@x},\LenToUnit{\ba@ci@y}){\usebox\ba@ci@box}%
 }
 % Stop a persistent \cornerimage* from decorating further slides.
 \newcommand\clearcornerimage{\ClearShipoutPictureFG}
