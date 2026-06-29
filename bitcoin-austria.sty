@@ -89,24 +89,59 @@
 \setbeamerfont{title}{family=\headlinefont}
 \setbeamerfont{headline}{size=\scriptsize}
 
-%% --- Aspect-ratio-aware heading scale ----------------------------------------
-% Beamer keeps font sizes physically constant across aspect ratios, so on the
-% narrower 4:3 canvas (128mm vs the 16:9 baseline of 160mm) the bold display
-% HEADINGS look oversized relative to the slide. We bring the headings (only)
-% down ~10% on narrow formats so their proportions track 16:9 and a little more
-% text fits per line. Body text is left untouched — 4:3's extra height absorbs
-% the extra wrapping. Simple 16:9-vs-narrow switch on \paperwidth; a smooth,
-% continuous paperwidth-driven scale (also covering 5:4 / 16:10 / 3:2) is a
-% deliberate later refinement.
-\def\ba@hnum{1}\def\ba@hden{1}            % default: no scaling (16:9 and wider)
-\ifdim\paperwidth<150mm\relax
-  \def\ba@hnum{9}\def\ba@hden{10}         % narrower than 16:9 (4:3, 5:4, …): x0.9
-\fi
-% Scaled \fontsize for headings (integer pt in): \ba@hsize{size}{baselineskip}.
-% \dimexpr's dimen*int/int form scales without intermediate overflow.
+%% --- Aspect-ratio-aware scaling ----------------------------------------------
+% Beamer keeps font sizes physically constant across aspect ratios. On a
+% narrower-than-16:9 canvas that makes the SAME points look oversized and, worse,
+% the body column loses ~22% width while the page gains only ~7% height — so
+% text-dense slides wrap to more lines than the extra height can hold and run off
+% the bottom. We counter that AUTOMATICALLY, scaled smoothly with \paperwidth
+% (so 5:4 / 16:10 / 3:2 are covered too — no hard cliff), via three layered
+% levers — spacing first (no font shrink), then a heading scale, then a gentle
+% body scale:
+%   1. tighten list spacing on narrow formats
+%   2. scale the bold display HEADINGS   down to ~0.90 at 4:3
+%   3. scale the BODY size tree gently   down to ~0.92 at 4:3
+% 16:9 and wider are the baseline: the narrowness s below is 0 there, so every
+% lever is an exact no-op and 16:9 output is byte-for-byte unchanged. For the
+% rare slide that is STILL too dense at 4:3, the escape hatch \narrowonly{<code>}
+% (e.g. \narrowonly{\small}) runs <code> only on narrow formats.
+%
+% (Heading-only scaling on its own leaves dense 4:3 slides overflowing; measured
+% on a real deck, spacing recovers only ~4pt of a ~29pt overflow, so the body
+% scale carries most of the load. ~0.92 body + tightened lists clears it; 0.90
+% headings keep their reviewed 4:3 look.)
+%
+% s = narrowness in [0,1]: 0 at the 16:9 width (455pt), 1 at the 4:3 width (364pt).
+\pgfmathsetmacro\ba@s{max(0,min(1,(455-\paperwidth)/(455-364)))}
+\pgfmathsetmacro\ba@hfactor{1-0.10*\ba@s}    % headings: 1.00 .. 0.90
+\pgfmathsetmacro\ba@bfactor{1-0.08*\ba@s}    % body:     1.00 .. 0.92
+
+% Lever 2 — headings. Uses \fontsize DIRECTLY (not the kernel size hook below),
+% so headings get ONLY \ba@hfactor and are never double-scaled by the body lever.
+% \ba@hsize{size}{baselineskip}; integer pt in, scaled by the decimal factor.
 \newcommand\ba@hsize[2]{%
-  \fontsize{\dimexpr#1pt*\ba@hnum/\ba@hden\relax}%
-           {\dimexpr#2pt*\ba@hnum/\ba@hden\relax}\selectfont}
+  \fontsize{\dimexpr\ba@hfactor\dimexpr#1pt\relax\relax}%
+           {\dimexpr\ba@hfactor\dimexpr#2pt\relax\relax}\selectfont}
+
+% Lever 3 — body. Scale the whole size tree by \ba@bfactor through \@setfontsize,
+% the hook every \normalsize / \small / … funnels through, so all body sizes
+% shrink in proportion. Direct \fontsize calls (our headings) bypass it, so the
+% two levers never compound. At 16:9 \ba@bfactor=1 → exact no-op.
+\let\ba@orig@setfontsize\@setfontsize
+\renewcommand\@setfontsize[3]{%
+  \ba@orig@setfontsize{#1}{\dimexpr\ba@bfactor\dimexpr#2pt\relax\relax}%
+                         {\dimexpr\ba@bfactor\dimexpr#3pt\relax\relax}}
+
+% Lever 1 — list spacing. Tighten level-1 itemize/enumerate only on narrow
+% formats (16:9 keeps beamer's defaults untouched). \@listI is what \normalsize
+% restores \@listi from, so set both for the tightening to persist.
+\ifdim\paperwidth<450pt
+  \def\@listi{\leftmargin\leftmargini \topsep 3\p@ \parsep \z@ \itemsep 2\p@}%
+  \let\@listI\@listi
+\fi
+
+% Escape hatch: run <code> only on narrow (narrower-than-16:9) formats.
+\newcommand\narrowonly[1]{\ifdim\paperwidth<450pt #1\fi}
 
 %% --- Chrome ------------------------------------------------------------------
 \setbeamertemplate{navigation symbols}{}

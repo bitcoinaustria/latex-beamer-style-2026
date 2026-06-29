@@ -82,10 +82,35 @@ after. Key=value options:
 - **XeLaTeX** (the package loads Blinker via `fontspec`).
 - A current LaTeX kernel (2020-10+) — uses `\CurrentFilePath` to self-locate.
 - `latexmk` to build (recommended).
-- **Aspect ratio:** works at any beamer `aspectratio` — the demo uses 16:9
-  (`aspectratio=169`), and **4:3** is fully supported too; just set
-  `\documentclass[aspectratio=43]{beamer}`. The theme uses relative lengths, so
-  the layout (and corner images) adapt automatically.
+- **Aspect ratio:** works at any beamer `aspectratio` — the demo ships in 16:9
+  (`aspectratio=169`, the standard) and **4:3** (`aspectratio=43`); just set the
+  documentclass option. The theme uses relative lengths and **adapts the
+  typography automatically** on narrower formats (see below).
+
+### Aspect ratio & narrow-format scaling
+
+16:9 is the design baseline. On any **narrower-than-16:9** canvas (4:3, 5:4,
+14:9, …) beamer would otherwise keep the same physical point sizes on a ~20%
+narrower column, which both looks oversized and makes **text-dense slides
+overflow the bottom** (the column loses width faster than the page gains
+height). The theme corrects this automatically, scaled **smoothly with
+`\paperwidth`** (no hard 4:3-only switch), with three layered levers:
+
+1. **tighter list spacing** on narrow formats (no font shrink);
+2. **display headings** scaled down to ~0.90 at 4:3;
+3. the **body size tree** scaled gently to ~0.92 at 4:3.
+
+**16:9 (and wider, e.g. 16:10) is left byte-for-byte unchanged** — every lever is
+a no-op there. For the rare slide that is *still* too dense at 4:3, two escapes:
+
+- `\narrowonly{<code>}` — runs `<code>` only on narrow formats, e.g. put
+  `\narrowonly{\small}` at the top of one packed frame;
+- beamer's native `\begin{frame}[shrink]` — measures the frame and scales only if
+  it overflows (note: it also scales images and varies the size per slide).
+
+> Width-keyed scaling is intentionally simple and covers the common ratios well;
+> *wide-but-short* formats like 3:2 (90 mm tall) can still overflow a very dense
+> slide a little — reach for `\narrowonly`/`[shrink]` there.
 
 ## Use it in a presentation (git submodule)
 
