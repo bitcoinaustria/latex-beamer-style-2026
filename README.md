@@ -77,6 +77,22 @@ after. Key=value options:
 > frame, keep the body clear of the corner (e.g. set it in a narrower column),
 > as the demo's *Über uns* slide does.
 
+## Package options
+
+Set at load time, in the `\usepackage[...]` brackets:
+
+| option | effect |
+|--------|--------|
+| `white` (alias `whitebg`) | white canvas for standard content slides instead of the default light-grey brand canvas — a fallback if a projector or print has a contrast issue |
+| `grey` / `gray` | the default brand canvas, stated explicitly |
+
+```latex
+\usepackage[white]{theme/bitcoin-austria}
+```
+
+The default (no option) is the light-grey brand canvas. Dark theme slides
+(`\fillerslide`, full-bleed captions) are unaffected either way.
+
 ## Requirements
 
 - **XeLaTeX** (the package loads Blinker via `fontspec`).

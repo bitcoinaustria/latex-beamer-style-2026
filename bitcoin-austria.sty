@@ -37,6 +37,20 @@
 \RequirePackage[protrusion=true,expansion=false]{microtype}
 \usetikzlibrary{calc}
 
+%% --- Package options ---------------------------------------------------------
+% [white] (alias [whitebg]): use a WHITE canvas for standard content slides
+% instead of the default light-grey brand canvas — a fallback for projector or
+% print contrast issues. [grey]/[gray] selects the (default) brand canvas
+% explicitly. Dark theme slides (\fillerslide, full-bleed captions) are
+% unaffected either way. Load like: \usepackage[white]{theme/bitcoin-austria}.
+\newif\ifba@whitebg
+\DeclareOption{white}{\ba@whitebgtrue}
+\DeclareOption{whitebg}{\ba@whitebgtrue}
+\DeclareOption{grey}{\ba@whitebgfalse}
+\DeclareOption{gray}{\ba@whitebgfalse}
+\DeclareOption*{\PackageWarning{bitcoin-austria}{Unknown option '\CurrentOption' ignored}}
+\ProcessOptions\relax
+
 % Locate THIS package's directory so fonts/ and assets/ resolve no matter where
 % the submodule is mounted. \CurrentFilePath is the directory we were loaded
 % from (e.g. "theme"); we append a slash. A consumer may override by defining
@@ -55,6 +69,11 @@
 \definecolor{baGrey}{HTML}{ECECEC}
 \definecolor{baWhite}{HTML}{FFFFFF}
 
+% Standard-slide canvas: the light-grey brand colour by default; the [white]
+% package option switches it to white. Everything else references baCanvas.
+\colorlet{baCanvas}{baGrey}
+\ifba@whitebg\colorlet{baCanvas}{baWhite}\fi
+
 %% --- Typography: Blinker via fontspec ----------------------------------------
 \defaultfontfeatures{Ligatures=TeX}
 \setsansfont{Blinker}[
@@ -68,8 +87,8 @@
 \newfontfamily\lightfont{Blinker}[Path = \ba@root fonts/, Extension = .ttf, UprightFont = *-Light]
 
 %% --- Beamer colour theme -----------------------------------------------------
-\setbeamercolor{background canvas}{bg=baGrey}
-\setbeamercolor{normal text}{fg=baBlack, bg=baGrey}
+\setbeamercolor{background canvas}{bg=baCanvas}
+\setbeamercolor{normal text}{fg=baBlack, bg=baCanvas}
 \setbeamercolor{structure}{fg=baRed}
 \setbeamercolor{alerted text}{fg=baRed}
 \setbeamercolor{frametitle}{fg=baBlack}
