@@ -89,6 +89,25 @@
 \setbeamerfont{title}{family=\headlinefont}
 \setbeamerfont{headline}{size=\scriptsize}
 
+%% --- Aspect-ratio-aware heading scale ----------------------------------------
+% Beamer keeps font sizes physically constant across aspect ratios, so on the
+% narrower 4:3 canvas (128mm vs the 16:9 baseline of 160mm) the bold display
+% HEADINGS look oversized relative to the slide. We bring the headings (only)
+% down ~10% on narrow formats so their proportions track 16:9 and a little more
+% text fits per line. Body text is left untouched — 4:3's extra height absorbs
+% the extra wrapping. Simple 16:9-vs-narrow switch on \paperwidth; a smooth,
+% continuous paperwidth-driven scale (also covering 5:4 / 16:10 / 3:2) is a
+% deliberate later refinement.
+\def\ba@hnum{1}\def\ba@hden{1}            % default: no scaling (16:9 and wider)
+\ifdim\paperwidth<150mm\relax
+  \def\ba@hnum{9}\def\ba@hden{10}         % narrower than 16:9 (4:3, 5:4, …): x0.9
+\fi
+% Scaled \fontsize for headings (integer pt in): \ba@hsize{size}{baselineskip}.
+% \dimexpr's dimen*int/int form scales without intermediate overflow.
+\newcommand\ba@hsize[2]{%
+  \fontsize{\dimexpr#1pt*\ba@hnum/\ba@hden\relax}%
+           {\dimexpr#2pt*\ba@hnum/\ba@hden\relax}\selectfont}
+
 %% --- Chrome ------------------------------------------------------------------
 \setbeamertemplate{navigation symbols}{}
 \setbeamersize{text margin left=20pt, text margin right=20pt}
@@ -120,7 +139,7 @@
 % Frame title: heavy dark headline with a short red accent rule beneath.
 \setbeamertemplate{frametitle}{%
   \vskip8pt%
-  {\usebeamerfont{frametitle}\color{baBlack}\fontsize{19}{22}\selectfont\insertframetitle}\par
+  {\usebeamerfont{frametitle}\color{baBlack}\ba@hsize{19}{22}\insertframetitle}\par
   \vskip3pt%
   {\color{baRed}\rule{2.4em}{2pt}}\par
   \vskip4pt%
@@ -129,7 +148,7 @@
 %% --- Title page --------------------------------------------------------------
 \setbeamertemplate{title page}{%
   \vfill
-  {\headlinefont\color{baBlack}\fontsize{36}{40}\selectfont\inserttitle\par}%
+  {\headlinefont\color{baBlack}\ba@hsize{36}{40}\inserttitle\par}%
   \vskip0.45em%
   {\color{baRed}\rule{2.6em}{3pt}\par}%
   \ifx\insertsubtitle\@empty\else
@@ -145,7 +164,7 @@
 %% --- Section divider (centred, like the brand master) ------------------------
 \setbeamertemplate{section page}{%
   \centering\vfill
-  {\headlinefont\color{baBlack}\fontsize{30}{34}\selectfont\insertsectionhead\par}%
+  {\headlinefont\color{baBlack}\ba@hsize{30}{34}\insertsectionhead\par}%
   \vskip0.4em{\color{baRed}\rule{2.4em}{2.5pt}\par}%
   \vfill
 }
@@ -197,7 +216,7 @@
       \centering\vfill
       \includegraphics[height=20pt]{ba-logomark-light}\par
       \vskip1.1em
-      {\headlinefont\color{baWhite}\fontsize{30}{34}\selectfont #2\par}%
+      {\headlinefont\color{baWhite}\ba@hsize{30}{34} #2\par}%
       \vskip0.5em{\color{baRed}\rule{2.6em}{2.5pt}\par}%
       \notblank{#1}{\vskip0.7em{\lightfont\color{baWhite!85}\fontsize{15}{19}\selectfont #1\par}}{}%
       \vfill

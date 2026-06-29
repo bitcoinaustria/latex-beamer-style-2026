@@ -30,13 +30,15 @@ jobs:
             latexmk \
             make
 
-      - name: Build the demo deck
+      - name: Build the demo deck (16:9 and 4:3)
         working-directory: example
         run: make
 
-      - name: Upload demo PDF
+      - name: Upload demo PDFs
         uses: actions/upload-artifact@v7
         with:
           name: bitcoin-austria-style-demo
-          path: example/demo.pdf
+          path: |
+            example/demo.pdf
+            example/demo-43.pdf
           retention-days: 30

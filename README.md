@@ -9,10 +9,12 @@ for reuse across presentations (consumed as a **git submodule**).
 
 ![Bitcoin Austria beamer style — sample slides](example/preview.png)
 
-A rendered sample of the current style. The full deck is committed at
-**[`example/demo.pdf`](example/demo.pdf)** — open it for a quick look without
-building anything. (Both the PDF and the montage above are regenerated from
-`example/demo.tex`; rebuild with `cd example && make`.)
+A rendered sample of the current style. The full deck is committed in **both
+aspect ratios** — **[`example/demo.pdf`](example/demo.pdf)** (16:9, the standard)
+and **[`example/demo-43.pdf`](example/demo-43.pdf)** (4:3) — open them side by
+side to see how the theme arranges the *same* slides in each format. (The PDFs
+and montages are regenerated from `example/demo-common.tex`; rebuild the decks
+with `cd example && make`, and the preview montages with `make preview`.)
 
 ## What's in here
 
@@ -121,8 +123,20 @@ before loading:
 
 ```bash
 cd example
-latexmk -xelatex demo.tex      # -> demo.pdf
+make                  # both decks:  demo.pdf (16:9)  +  demo-43.pdf (4:3)
+make preview          # regenerate the README montages (needs ImageMagick)
 ```
+
+Or build a single ratio directly:
+
+```bash
+latexmk -xelatex demo.tex      # -> demo.pdf     (16:9, the standard)
+latexmk -xelatex demo-43.tex   # -> demo-43.pdf  (4:3)
+```
+
+Both decks share their slides via `demo-common.tex`; the two wrapper files differ
+only in the `aspectratio=` documentclass option, so the comparison is apples to
+apples.
 
 ## Licensing
 
