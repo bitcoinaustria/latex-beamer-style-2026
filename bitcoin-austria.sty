@@ -190,6 +190,26 @@
 % No footline (the frame number lives in the headline).
 \setbeamertemplate{footline}{}
 
+%% --- Footnotes: brand colours + mark pinned flush-left -----------------------
+% Beamer's default floats the footnote mark ~2.8em in from the left (a 1em
+% parindent plus the mark set right-aligned in a ~1.8em box), which looks oddly
+% indented for a short gloss. Pin the mark hard against the left margin and put
+% a small gap before the text. TWO independent paths both need this: beamer's
+% {footnote} template for frame-level footnotes, and LaTeX's \@makefntext for
+% the minipage/column footnotes raised inside \comparisonslide's columns (those
+% even get a lettered mark, and the beamer template does not touch them).
+% Colours follow the brand: red mark, dark text.
+\setbeamercolor{footnote}{fg=baBlack}
+\setbeamercolor{footnote mark}{fg=baRed}
+\setbeamertemplate{footnote}{%
+  \parindent0pt\noindent\raggedright
+  \hbox{\usebeamercolor[fg]{footnote mark}\insertfootnotemark}\hspace{0.35em}%
+  {\usebeamercolor[fg]{footnote}\insertfootnotetext}\par%
+}
+\renewcommand\@makefntext[1]{%
+  \parindent0pt\noindent
+  \hbox{\usebeamercolor[fg]{footnote mark}\@makefnmark}\hspace{0.35em}#1}
+
 % Frame title: heavy dark headline with a short red accent rule beneath.
 \setbeamertemplate{frametitle}{%
   \vskip8pt%
